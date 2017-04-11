@@ -146,7 +146,7 @@ export default class Department extends React.Component{
 
     __renderTableRows = () => {
         let arr = [];
-        let datas = this.state.employeeData;
+        let datas = this.state.departmentData;
 
         for(let i = 0; i< datas.length; i++){
             let data = datas[i];
@@ -192,7 +192,7 @@ export default class Department extends React.Component{
 
     __onDelete = (data) => {
         jajax.ajax({
-            url: "http://localhost:8080/employee/delete",
+            url: "http://localhost:8080/department/delete",
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json"

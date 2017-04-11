@@ -14,7 +14,8 @@ import Nav from "react-bootstrap/lib/Nav.js";
 import NavDropdown from "react-bootstrap/lib/NavDropdown.js";
 import NavItem from "react-bootstrap/lib/NavItem";
 import Employee from "./pages/Employee.js";
-import Department from "./pages/Department.js"
+import Department from "./pages/Department.js";
+import Meeting from "./pages/Meeting.js";
 
 export default class App extends Component {
 
@@ -40,7 +41,7 @@ export default class App extends Component {
                         <NavItem eventKey={2} href="#">Link</NavItem>
                     </Nav>
                 </Navbar>
-            <Col style={{padding: 30}}>
+            <Col style={{paddingLeft: 300,paddingRight: 300,}}>
 
                 <Tabs defaultActiveKey={1} id="uncontrolled-tab-example">
                 <Tab eventKey={1} title="Employee">
@@ -49,7 +50,9 @@ export default class App extends Component {
                 <Tab eventKey={2} title="Department">
                     <Department/>
                 </Tab>
-                <Tab eventKey={3} title="Tab 3">Tab 3 content</Tab>
+                <Tab eventKey={3} title="Meeting">
+                    <Meeting/>
+                </Tab>
             </Tabs>
             </Col>
                 </Col>);

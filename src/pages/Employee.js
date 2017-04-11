@@ -10,8 +10,7 @@ import jajax from "robe-ajax";
 import Toast from "robe-react-ui/lib/toast/Toast";
 import Table from "react-bootstrap/lib/Table";
 import Button from "react-bootstrap/lib/Button";
-
-import ModalDataForm from "robe-react-ui/lib/form/ModalDataForm";
+import Modal from 'react-awesome-modal';
 
 export default class Employee extends React.Component{
     constructor(props) {
@@ -24,13 +23,34 @@ export default class Employee extends React.Component{
             surname: "",
             salary: undefined,
             update: true,
-            buttonName: "Add New "
+            buttonName: "Add New ",
+                visible:false
         };
+    }
+
+    openModal() {
+        this.setState({
+            visible : true
+        });
+    }
+
+    closeModal() {
+        this.setState({
+            visible : false
+        });
     }
 
     render() {
         return (
             <Panel header={"Employee"} bsStyle="success">
+
+                <Modal
+                    visible={this.state.visible}
+                    width="500"
+                    height="350"
+                    effect="fadeInUp"
+                    onClickAway={() => this.closeModal()}
+                    >
 
                 <Col style={{padding: 10}}>
                     <TextInput
@@ -83,8 +103,13 @@ export default class Employee extends React.Component{
                             onClick={this.__saveEmployee}>{this.state.buttonName} Employee</Button>
 
                 </Col>
+
+
+                </Modal>
                 {this.__renderTable()}
 
+                <Button className="pull-right" bsStyle="success" style={{marginBottom: 15}}
+                        onClick={() => this.openModal()} > Add New Employee</Button>
             </Panel>
         );
     }
