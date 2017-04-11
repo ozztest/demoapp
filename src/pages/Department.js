@@ -1,17 +1,13 @@
 import React from 'react';
-import Select from 'react-select';
-import Navbar from "react-bootstrap/lib/Navbar.js";
 import TextInput from "robe-react-ui/lib/inputs/TextInput";
 import Panel from "react-bootstrap/lib/Panel";
 import Col from "react-bootstrap/lib/Col";
-import NumericInput from "robe-react-ui/lib/inputs/TextInput";
 import SelectInput from "robe-react-ui/lib/inputs/SelectInput";
 import jajax from "robe-ajax";
 import Toast from "robe-react-ui/lib/toast/Toast";
 import Table from "react-bootstrap/lib/Table";
 import Button from "react-bootstrap/lib/Button";
-
-import ModalDataForm from "robe-react-ui/lib/form/ModalDataForm";
+import Modal from 'react-awesome-modal';
 
 export default class Department extends React.Component{
     constructor(props) {
@@ -55,8 +51,8 @@ export default class Department extends React.Component{
                     }}/>
 
                     <SelectInput
-                        label="Select Input Multi"
-                        name="MultiSelect"
+                        label="Meetings"
+                        name="meeting"
                         multi={true}
                         items={this.state.meetingData}
                         value={this.state.meeting}
@@ -70,7 +66,7 @@ export default class Department extends React.Component{
 
 
                     <Button className="pull-right" bsStyle="success" style={{marginBottom: 15}}
-                            onClick={this.__saveEmployee}>{this.state.buttonName} Department</Button>
+                            onClick={this.__saveDepartment}>{this.state.buttonName} Department</Button>
 
                 </Col>
                 {this.__renderTable()}
@@ -78,7 +74,7 @@ export default class Department extends React.Component{
             </Panel>
         );
     }
-    __saveEmployee =(e) => {
+    __saveDepartment =(e) => {
         let data = {
             name: this.state.name,
             description: this.state.description,
@@ -106,12 +102,11 @@ export default class Department extends React.Component{
         }).always(function(xhr) {
             if(xhr.status === 200){
                 Toast.success("Department saved successfully...");
-                this.__getEmployeeData()
+                this.__getMeetingData()
                 this.setState({
                     name: "",
-                    surname: "",
-                    salary: undefined,
-                    department: "",
+                    description: "",
+                    meeting: "",
                     buttonName: "Add New ",
                     update:false
                 });
@@ -147,23 +142,31 @@ export default class Department extends React.Component{
     __renderTableRows = () => {
         let arr = [];
         let datas = this.state.departmentData;
-
+        console.log(this.state.departmentData)
         for(let i = 0; i< datas.length; i++){
             let data = datas[i];
             arr.push(
                 <tr key={i}>
                     <td>{data.id}</td>
                     <td>{data.name}</td>
+
                     <td>{data.description}</td>
-                    <td>{data.meeting.name}</td>
-                    <td><Button onClick={this.__fillAreasWithSelectedEmployee.bind(undefined, data)}>Update</Button></td>
-                    <td><Button onClick={this.__onDelete.bind(undefined, data)}>Delete</Button></td>
+
+                    <td>{data.meeting}</td>
+                    <td><Button style={{margin: 5}}
+                                onClick={this.__fillAreasWithSelectedDepartment.bind(undefined, data)}>
+                        Update
+                    </Button></td>
+                    <td><Button style={{margin: 5}}
+                                onClick={this.__onDelete.bind(undefined, data)}>
+                        Delete
+                    </Button></td>
                 </tr>);
         }
         return arr;
     };
 
-    __getEmployeeData = () => {
+    __getMeetingData = () => {
         jajax.ajax({
             url: "http://localhost:8080/department/findAll",
             method: "GET",
@@ -171,22 +174,23 @@ export default class Department extends React.Component{
             crossDomain: true
         }).always(function(xhr) {
             if(xhr.status === 200){
-                this.setState({employeeData: JSON.parse(xhr.responseText)});
+                this.setState({
+                    departmentData: JSON.parse(xhr.responseText)
+                });
+
             }
         }.bind(this));
+
     };
 
-    __fillAreasWithSelectedEmployee= (data) =>{
-        this.setState({name: data.name,
-            surname:data.surname,
-            salary:data.salary,
-            department:data.department.id,
+    __fillAreasWithSelectedDepartment= (data) =>{
+        this.setState({
+            name: data.name,
+            description:data.description,
+            meetingData:data.meetingData,
             buttonName:"Update ",
             update:true
         });
-
-
-        console.log(data.department.id)
     };
 
 
@@ -203,14 +207,14 @@ export default class Department extends React.Component{
             crossDomain: true
         }).always(function(xhr) {
             if(xhr.status === 200){
-                this.__getEmployeeData()
+                this.__getMeetingData()
             }
         }.bind(this));
     };
 
     componentDidMount () {
 
-        this.__getEmployeeData();
+        this.__getMeetingData();
 
         jajax.ajax({
             url: "http://localhost:8080/department/findAll",

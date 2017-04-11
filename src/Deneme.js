@@ -13,7 +13,7 @@ export default class Deneme extends Component {
 
   render() {
     return (<span>
-          {this.props.tunahan}
+          {this.props.ozgen}
       </span>
     );
   }

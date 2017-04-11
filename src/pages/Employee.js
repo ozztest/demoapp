@@ -1,10 +1,8 @@
 import React from 'react';
-import Select from 'react-select';
-import Navbar from "react-bootstrap/lib/Navbar.js";
 import TextInput from "robe-react-ui/lib/inputs/TextInput";
 import Panel from "react-bootstrap/lib/Panel";
 import Col from "react-bootstrap/lib/Col";
-import NumericInput from "robe-react-ui/lib/inputs/TextInput";
+import NumericInput from "robe-react-ui/lib/inputs/NumericInput";
 import SelectInput from "robe-react-ui/lib/inputs/SelectInput";
 import jajax from "robe-ajax";
 import Toast from "robe-react-ui/lib/toast/Toast";
@@ -148,7 +146,7 @@ export default class Employee extends React.Component{
         }).always(function(xhr) {
             if(xhr.status === 200){
                 Toast.success("Employee saved successfully...");
-                this.__getEmployeeData();
+                this.__getMeetingData();
                this.__clearForm()
             }
         }.bind(this));
@@ -262,7 +260,7 @@ console.log(data.department.id)
             crossDomain: true
         }).always(function(xhr) {
             if(xhr.status === 200){
-                this.__getEmployeeData()
+                this.__getMeetingData()
             }
         }.bind(this));
     };
