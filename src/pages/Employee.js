@@ -35,7 +35,9 @@ export default class Employee extends React.Component{
     }
 
     closeModal() {
+        this.__clearForm();
         this.setState({
+
             visible : false
         });
     }
@@ -113,6 +115,8 @@ export default class Employee extends React.Component{
             </Panel>
         );
     }
+
+
     __saveEmployee =(e) => {
         let data = {
             name: this.state.name,
@@ -126,7 +130,7 @@ export default class Employee extends React.Component{
         let method="POST";
 
         if(this.state.update){
-            console.log(this.state.update)
+            console.log(this.state.update);
             url ="http://localhost:8080/employee/update/";
             method = "PUT";
             console.log(method)
@@ -144,26 +148,30 @@ export default class Employee extends React.Component{
         }).always(function(xhr) {
             if(xhr.status === 200){
                 Toast.success("Employee saved successfully...");
-                this.__getEmployeeData()
-                this.setState({
-                    name: "",
-                    surname: "",
-                    salary: undefined,
-                    department: "",
-                    buttonName: "Add New ",
-                    update:false
-                });
+                this.__getEmployeeData();
+               this.__clearForm()
             }
         }.bind(this));
 
-    }
+        this.closeModal();
 
+    };
+    __clearForm =() => {
+        this.setState({
+            name: "",
+            surname: "",
+            salary: undefined,
+            department: "",
+            buttonName: "Add New ",
+            update:false
+        });
+};
     __handleChange = (e) => {
         let state = {};
         let value = e.target.parsedValue !== undefined ? e.target.parsedValue : e.target.value;
         state[e.target.name] = value;
         this.setState(state);
-    }
+    };
 
     __renderTable = () => {
         return <Table responsive style={{marginTop: 60}}>
@@ -197,8 +205,15 @@ export default class Employee extends React.Component{
                     <td>{data.surname}</td>
                     <td>{data.salary}</td>
                     <td>{data.department.name}</td>
-                    <td><Button onClick={this.__fillAreasWithSelectedEmployee.bind(undefined, data)}>Update</Button>
-                        <Button onClick={this.__onDelete.bind(undefined, data)}>Delete</Button>
+                    <td>
+                        <Button style={{margin: 5}}
+                                onClick={this.__fillAreasWithSelectedEmployee.bind(undefined, data)}>
+                            Update
+                        </Button>
+                        <Button style={{margin: 5}}
+                                onClick={this.__onDelete.bind(undefined, data)}>
+                            Delete
+                        </Button>
                     </td>
                 </tr>);
         }
@@ -219,6 +234,8 @@ export default class Employee extends React.Component{
     };
 
     __fillAreasWithSelectedEmployee= (data) =>{
+        this.openModal();
+
         this.setState({name: data.name,
             surname:data.surname,
             salary:data.salary,
