@@ -2,6 +2,7 @@ import React from 'react';
 import TextInput from "robe-react-ui/lib/inputs/TextInput";
 import Panel from "react-bootstrap/lib/Panel";
 import Col from "react-bootstrap/lib/Col";
+import NumericInput from "robe-react-ui/lib/inputs/NumericInput";
 import SelectInput from "robe-react-ui/lib/inputs/SelectInput";
 import jajax from "robe-ajax";
 import Toast from "robe-react-ui/lib/toast/Toast";
@@ -12,77 +13,91 @@ import Modal from 'react-awesome-modal';
 export default class Department extends React.Component{
     constructor(props) {
         super(props);
-
         this.state = {
             departmentData : [],
             meetingData : [],
+            meeting: "",
+            id: undefined,
             name: "",
             description: "",
             update: true,
-            buttonName: "Add New "
+            buttonName: "Add New ",
+            visible:false
         };
     }
 
     render() {
         return (
+
             <Panel header={"Department"} bsStyle="success">
 
-                <Col style={{padding: 10}}>
-                    <TextInput
-                        label="Name"
-                        name="name"
-                        validationDisplay="overlay"
-                        value={this.state.name}
-                        onChange={this.__handleChange}
-                        validations={{
+                <Modal
+                    visible={this.state.visible}
+                    width="500"
+                    height="350"
+                    effect="fadeInUp"
+                    onClickAway={() => this.closeModal()}
+                    >
+
+                    <Col style={{padding: 10}}>
+                        <TextInput
+                            label="Name"
+                            name="name"
+                            validationDisplay="overlay"
+                            value={this.state.name}
+                            onChange={this.__handleChange}
+                            validations={{
                         required: true
 
                     }}/>
 
-                    <TextInput
-                        label="Description"
-                        name="description"
-                        validationDisplay="overlay"
-                        value={this.state.description}
-                        onChange={this.__handleChange}
-                        validations={{
+                        <TextInput
+                            label="Description"
+                            name="description"
+                            validationDisplay="overlay"
+                            value={this.state.description}
+                            onChange={this.__handleChange}
+                            validations={{
                         required: true,
-
+                        minLength: {
+                            args: [3]
+                        }
                     }}/>
 
-                    <SelectInput
-                        label="Meetings"
-                        name="meeting"
-                        multi={true}
-                        items={this.state.meetingData}
-                        value={this.state.meeting}
-                        textField="value"
-                        valueField="key"
-                        onChange={this.__handleChange}
-                        validations={{
-                        required: true
-                    }}
-                        />
+                        <SelectInput
+                            label="Meeting"
+                            name="department"
+                            items={this.state.meetingData}
+                            textField="name"
+                            valueField="id"
+                            readOnly={true}
+                            value={this.state.meeting}
+                            onChange={this.__handleChange}
+                            />
 
-
-                    <Button className="pull-right" bsStyle="success" style={{marginBottom: 15}}
-                            onClick={this.__saveDepartment}>{this.state.buttonName} Department</Button>
-
-                </Col>
+                        <Button className="pull-right" bsStyle="success" style={{marginBottom: 15}}
+                                onClick={this.__saveDepartment}>{this.state.buttonName} Department</Button>
+                    </Col>
+                </Modal>
                 {this.__renderTable()}
 
+                <Button className="pull-right" bsStyle="success" style={{marginBottom: 15}}
+                        onClick={() => this.openModal()} > Add New Department</Button>
             </Panel>
         );
     }
+
     __saveDepartment =(e) => {
+        console.log(this.state.meetingData)
         let data = {
+            id: this.state.id,
             name: this.state.name,
             description: this.state.description,
             meeting: {
                 id: this.state.meeting
             }
         };
-        let url = "http://localhost:8080/department/save/" + this.state.meeting;
+        let url = "http://localhost:8080/department/save/" ;
         let method="POST";
 
         if(this.state.update){
@@ -102,25 +117,30 @@ export default class Department extends React.Component{
         }).always(function(xhr) {
             if(xhr.status === 200){
                 Toast.success("Department saved successfully...");
-                this.__getMeetingData()
-                this.setState({
-                    name: "",
-                    description: "",
-                    meeting: "",
-                    buttonName: "Add New ",
-                    update:false
-                });
+                this.__getDepartmentData();
+                this.__clearForm()
             }
         }.bind(this));
 
-    }
+        this.closeModal();
 
+    };
+    __clearForm () {
+        this.setState({
+            id:undefined,
+            name: "",
+            description: "",
+            meeting: "",
+            buttonName: "Add New ",
+            update:false
+        });
+    };
     __handleChange = (e) => {
         let state = {};
         let value = e.target.parsedValue !== undefined ? e.target.parsedValue : e.target.value;
         state[e.target.name] = value;
         this.setState(state);
-    }
+    };
 
     __renderTable = () => {
         return <Table responsive style={{marginTop: 60}}>
@@ -129,6 +149,7 @@ export default class Department extends React.Component{
                 <th>Department Id</th>
                 <th>Name</th>
                 <th>Description</th>
+                <th>Meeting</th>
                 <th>Action</th>
             </tr>
             </thead>
@@ -142,31 +163,30 @@ export default class Department extends React.Component{
     __renderTableRows = () => {
         let arr = [];
         let datas = this.state.departmentData;
-        console.log(this.state.departmentData)
+
         for(let i = 0; i< datas.length; i++){
             let data = datas[i];
             arr.push(
                 <tr key={i}>
                     <td>{data.id}</td>
                     <td>{data.name}</td>
-
                     <td>{data.description}</td>
-
-                    <td>{data.meeting}</td>
-                    <td><Button style={{margin: 5}}
+                    <td>
+                        <Button style={{margin: 5}}
                                 onClick={this.__fillAreasWithSelectedDepartment.bind(undefined, data)}>
-                        Update
-                    </Button></td>
-                    <td><Button style={{margin: 5}}
+                            Update
+                        </Button>
+                        <Button style={{margin: 5}}
                                 onClick={this.__onDelete.bind(undefined, data)}>
-                        Delete
-                    </Button></td>
+                            Delete
+                        </Button>
+                    </td>
                 </tr>);
         }
         return arr;
     };
 
-    __getMeetingData = () => {
+    __getDepartmentData = () => {
         jajax.ajax({
             url: "http://localhost:8080/department/findAll",
             method: "GET",
@@ -174,20 +194,18 @@ export default class Department extends React.Component{
             crossDomain: true
         }).always(function(xhr) {
             if(xhr.status === 200){
-                this.setState({
-                    departmentData: JSON.parse(xhr.responseText)
-                });
-
+                this.setState({departmentData: JSON.parse(xhr.responseText)});
             }
         }.bind(this));
-
     };
 
     __fillAreasWithSelectedDepartment= (data) =>{
+        this.openModal();
+
         this.setState({
+            id:data.id,
             name: data.name,
             description:data.description,
-            meetingData:data.meetingData,
             buttonName:"Update ",
             update:true
         });
@@ -207,14 +225,31 @@ export default class Department extends React.Component{
             crossDomain: true
         }).always(function(xhr) {
             if(xhr.status === 200){
-                this.__getMeetingData()
+                this.__getDepartmentData();
             }
         }.bind(this));
     };
 
+
+
+    openModal=() => {
+        this.setState({
+            visible : true
+        });
+    }
+
+    closeModal =() => {
+        this.__clearForm();
+        this.setState({
+
+            visible : false
+        });
+    }
+
+
     componentDidMount () {
 
-        this.__getMeetingData();
+        this.__getDepartmentData();
 
         jajax.ajax({
             url: "http://localhost:8080/department/findAll",
@@ -223,7 +258,7 @@ export default class Department extends React.Component{
             crossDomain: true
         }).always(function(xhr) {
             if(xhr.status === 200){
-                this.setState({meetingData: JSON.parse(xhr.responseText)});
+                this.setState({departmentData: JSON.parse(xhr.responseText)});
             }
         }.bind(this));
     };

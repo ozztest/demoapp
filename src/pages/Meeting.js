@@ -102,7 +102,7 @@ export default class Meeting extends React.Component{
         }).always(function(xhr) {
             if(xhr.status === 200){
                 Toast.success("Meeting saved successfully...");
-                this.__getMeetingData()
+                this.__getDepartmentData()
                 this.setState({
                     name: "",
                     description: "",
@@ -196,7 +196,7 @@ export default class Meeting extends React.Component{
             crossDomain: true
         }).always(function(xhr) {
             if(xhr.status === 200){
-                this.__getMeetingData()
+                this.__getDepartmentData()
             }
         }.bind(this));
     };

@@ -13,35 +13,22 @@ import Modal from 'react-awesome-modal';
 export default class Employee extends React.Component{
     constructor(props) {
         super(props);
-
             this.state = {
-            employeeData : [],
-            departmentData : [],
-            name: "",
-            surname: "",
-            salary: undefined,
-            update: true,
-            buttonName: "Add New ",
+                employeeData : [],
+                departmentData : [],
+                id: undefined,
+                name: "",
+                surname: "",
+                salary: undefined,
+                update: true,
+                buttonName: "Add New ",
                 visible:false
-        };
-    }
-
-    openModal() {
-        this.setState({
-            visible : true
-        });
-    }
-
-    closeModal() {
-        this.__clearForm();
-        this.setState({
-
-            visible : false
-        });
+            };
     }
 
     render() {
         return (
+
             <Panel header={"Employee"} bsStyle="success">
 
                 <Modal
@@ -101,10 +88,7 @@ export default class Employee extends React.Component{
 
                     <Button className="pull-right" bsStyle="success" style={{marginBottom: 15}}
                             onClick={this.__saveEmployee}>{this.state.buttonName} Employee</Button>
-
                 </Col>
-
-
                 </Modal>
                 {this.__renderTable()}
 
@@ -114,9 +98,24 @@ export default class Employee extends React.Component{
         );
     }
 
+    openModal=() => {
+        this.setState({
+            visible : true
+        });
+    }
+
+    closeModal =() => {
+        this.__clearForm();
+        this.setState({
+
+            visible : false
+        });
+    }
+
 
     __saveEmployee =(e) => {
         let data = {
+            id: this.state.id,
             name: this.state.name,
             surname: this.state.surname,
             salary: this.state.salary,
@@ -146,7 +145,7 @@ export default class Employee extends React.Component{
         }).always(function(xhr) {
             if(xhr.status === 200){
                 Toast.success("Employee saved successfully...");
-                this.__getMeetingData();
+                this.__getEmployeeData();
                this.__clearForm()
             }
         }.bind(this));
@@ -154,8 +153,9 @@ export default class Employee extends React.Component{
         this.closeModal();
 
     };
-    __clearForm =() => {
+    __clearForm () {
         this.setState({
+            id:undefined,
             name: "",
             surname: "",
             salary: undefined,
@@ -234,16 +234,15 @@ export default class Employee extends React.Component{
     __fillAreasWithSelectedEmployee= (data) =>{
         this.openModal();
 
-        this.setState({name: data.name,
+        this.setState({
+            id:data.id,
+            name: data.name,
             surname:data.surname,
             salary:data.salary,
             department:data.department.id,
             buttonName:"Update ",
             update:true
         });
-
-
-console.log(data.department.id)
     };
 
 
@@ -260,7 +259,7 @@ console.log(data.department.id)
             crossDomain: true
         }).always(function(xhr) {
             if(xhr.status === 200){
-                this.__getMeetingData()
+                this.__getEmployeeData();
             }
         }.bind(this));
     };
