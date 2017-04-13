@@ -66,7 +66,7 @@ export default class Department extends React.Component{
 
                         <SelectInput
                             label="Meeting"
-                            name="department"
+                            name="meeting"
                             items={this.state.meetingData}
                             textField="name"
                             valueField="id"
@@ -87,44 +87,7 @@ export default class Department extends React.Component{
         );
     }
 
-    __saveDepartment =(e) => {
-        console.log(this.state.meetingData)
-        let data = {
-            id: this.state.id,
-            name: this.state.name,
-            description: this.state.description,
-            meeting: {
-                id: this.state.meeting
-            }
-        };
-        let url = "http://localhost:8080/department/save/" ;
-        let method="POST";
 
-        if(this.state.update){
-            url ="http://localhost:8080/department/update/";
-            method = "PUT";
-        }
-        jajax.ajax({
-            url: url,
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            method: method,
-            data: JSON.stringify(data),
-            dataType: "application/json",
-            crossDomain: true
-        }).always(function(xhr) {
-            if(xhr.status === 200){
-                Toast.success("Department saved successfully...");
-                this.__getDepartmentData();
-                this.__clearForm()
-            }
-        }.bind(this));
-
-        this.closeModal();
-
-    };
     __clearForm () {
         this.setState({
             id:undefined,
@@ -186,18 +149,7 @@ export default class Department extends React.Component{
         return arr;
     };
 
-    __getDepartmentData = () => {
-        jajax.ajax({
-            url: "http://localhost:8080/department/findAll",
-            method: "GET",
-            dataType: "application/json",
-            crossDomain: true
-        }).always(function(xhr) {
-            if(xhr.status === 200){
-                this.setState({departmentData: JSON.parse(xhr.responseText)});
-            }
-        }.bind(this));
-    };
+
 
     __fillAreasWithSelectedDepartment= (data) =>{
         this.openModal();
@@ -210,8 +162,57 @@ export default class Department extends React.Component{
             update:true
         });
     };
+    __getDepartmentData = () => {
+        jajax.ajax({
+            url: "http://localhost:8080/department/findAll",
+            method: "GET",
+            dataType: "application/json",
+            crossDomain: true
+        }).always(function(xhr) {
+            if(xhr.status === 200){
+                this.setState({departmentData: JSON.parse(xhr.responseText)});
+            }
+        }.bind(this));
+    };
+    __saveDepartment =(e) => {
 
+        let data = {
+            id: this.state.id,
+            name: this.state.name,
+            description: this.state.description,
+            meeting: {
+                id: this.state.meeting
+            }
+        };
+        console.log(data)
+        let url = "http://localhost:8080/department/save/" + this.state.meeting ;
+        let method="POST";
 
+        if(this.state.update){
+            url ="http://localhost:8080/department/update/";
+            method = "PUT";
+        }
+        jajax.ajax({
+            url: url,
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            method: method,
+            data: JSON.stringify(data),
+            dataType: "application/json",
+            crossDomain: true
+        }).always(function(xhr) {
+            if(xhr.status === 200){
+                Toast.success("Department saved successfully...");
+                this.__getDepartmentData();
+                this.__clearForm()
+            }
+        }.bind(this));
+
+        this.closeModal();
+
+    };
     __onDelete = (data) => {
         jajax.ajax({
             url: "http://localhost:8080/department/delete",
@@ -252,13 +253,13 @@ export default class Department extends React.Component{
         this.__getDepartmentData();
 
         jajax.ajax({
-            url: "http://localhost:8080/department/findAll",
+            url: "http://localhost:8080/meeting/findAll",
             method: "GET",
             dataType: "application/json",
             crossDomain: true
         }).always(function(xhr) {
             if(xhr.status === 200){
-                this.setState({departmentData: JSON.parse(xhr.responseText)});
+                this.setState({meetingData: JSON.parse(xhr.responseText)});
             }
         }.bind(this));
     };
