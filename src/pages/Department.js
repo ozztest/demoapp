@@ -2,7 +2,6 @@ import React from 'react';
 import TextInput from "robe-react-ui/lib/inputs/TextInput";
 import Panel from "react-bootstrap/lib/Panel";
 import Col from "react-bootstrap/lib/Col";
-import NumericInput from "robe-react-ui/lib/inputs/NumericInput";
 import SelectInput from "robe-react-ui/lib/inputs/SelectInput";
 import jajax from "robe-ajax";
 import Toast from "robe-react-ui/lib/toast/Toast";
@@ -10,19 +9,19 @@ import Table from "react-bootstrap/lib/Table";
 import Button from "react-bootstrap/lib/Button";
 import Modal from 'react-awesome-modal';
 
-export default class Department extends React.Component{
+export default class Department extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            departmentData : [],
-            meetingData : [],
+            departmentData: [],
+            meetingData: [],
             meeting: "",
             id: undefined,
             name: "",
             description: "",
             update: true,
             buttonName: "Add New ",
-            visible:false
+            visible: false
         };
     }
 
@@ -74,35 +73,33 @@ export default class Department extends React.Component{
                             value={this.state.meeting}
                             onChange={this.__handleChange}
                             />
+                        {this.__closePopupButton()}
 
-                        <Button className="pull-right" bsStyle="success" style={{marginBottom: 15}}
+                        <Button className="pull-right" bsStyle="success" style={{marginTop: 15}}
                                 onClick={this.__saveDepartment}>{this.state.buttonName} Department</Button>
+
+
                     </Col>
                 </Modal>
                 {this.__renderTable()}
 
-                <Button className="pull-right" bsStyle="success" style={{marginBottom: 15}}
-                        onClick={() => this.openModal()} > Add New Department</Button>
+                <Button className="pull-right" bsStyle="success" style={{margin: 15}}
+                        onClick={() => this.openModal()}> Add New Department</Button>
             </Panel>
         );
     }
 
 
-    __clearForm () {
-        this.setState({
-            id:undefined,
-            name: "",
-            description: "",
-            meeting: "",
-            buttonName: "Add New ",
-            update:false
-        });
-    };
     __handleChange = (e) => {
         let state = {};
         let value = e.target.parsedValue !== undefined ? e.target.parsedValue : e.target.value;
         state[e.target.name] = value;
         this.setState(state);
+    };
+
+    __closePopupButton = () => {
+        return <Button className="pull-left" bsStyle="success" style={{marginTop: 15}}
+                       onClick={() => this.closeModal()}>Cancel</Button>;
     };
 
     __renderTable = () => {
@@ -126,8 +123,7 @@ export default class Department extends React.Component{
     __renderTableRows = () => {
         let arr = [];
         let datas = this.state.departmentData;
-
-        for(let i = 0; i< datas.length; i++){
+        for (let i = 0; i < datas.length; i++) {
             let data = datas[i];
             arr.push(
                 <tr key={i}>
@@ -150,31 +146,76 @@ export default class Department extends React.Component{
     };
 
 
-
-    __fillAreasWithSelectedDepartment= (data) =>{
+    __fillAreasWithSelectedDepartment = (data) => {
         this.openModal();
 
         this.setState({
-            id:data.id,
+            id: data.id,
             name: data.name,
-            description:data.description,
-            buttonName:"Update ",
-            update:true
+            description: data.description,
+            buttonName: "Update ",
+            update: true
         });
     };
+
+    __clearForm() {
+        this.setState({
+            id: undefined,
+            name: "",
+            description: "",
+            meeting: "",
+            buttonName: "Add New ",
+            update: false
+        });
+    };
+
+    openModal = () => {
+        this.setState({
+            visible: true
+        });
+    }
+
+    closeModal = () => {
+        this.__clearForm();
+        this.setState({
+
+            visible: false
+        });
+    }
+
+    componentDidMount() {
+
+        this.__getDepartmentData();
+        this.__getMeetingData();
+    };
+
+    __getMeetingData = ()=> {
+        jajax.ajax({
+            url: "http://localhost:8080/meeting/findAll",
+            method: "GET",
+            dataType: "application/json",
+            crossDomain: true
+        }).always(function (xhr) {
+            if (xhr.status === 200) {
+                this.setState({meetingData: JSON.parse(xhr.responseText)});
+            }
+        }.bind(this));
+    }
+
+
     __getDepartmentData = () => {
         jajax.ajax({
             url: "http://localhost:8080/department/findAll",
             method: "GET",
             dataType: "application/json",
             crossDomain: true
-        }).always(function(xhr) {
-            if(xhr.status === 200){
+        }).always(function (xhr) {
+            if (xhr.status === 200) {
                 this.setState({departmentData: JSON.parse(xhr.responseText)});
             }
         }.bind(this));
     };
-    __saveDepartment =(e) => {
+    __saveDepartment = (e) => {
 
         let data = {
             id: this.state.id,
@@ -185,11 +226,11 @@ export default class Department extends React.Component{
             }
         };
         console.log(data)
-        let url = "http://localhost:8080/department/save/" + this.state.meeting ;
-        let method="POST";
+        let url = "http://localhost:8080/department/save/" + this.state.meeting;
+        let method = "POST";
 
-        if(this.state.update){
-            url ="http://localhost:8080/department/update/";
+        if (this.state.update) {
+            url = "http://localhost:8080/department/update/";
             method = "PUT";
         }
         jajax.ajax({
@@ -202,10 +243,10 @@ export default class Department extends React.Component{
             data: JSON.stringify(data),
             dataType: "application/json",
             crossDomain: true
-        }).always(function(xhr) {
-            if(xhr.status === 200){
+        }).always(function (xhr) {
+            if (xhr.status === 200) {
                 Toast.success("Department saved successfully...");
-                this.__getDepartmentData();
+                this.__getMeetingDatas();
                 this.__clearForm()
             }
         }.bind(this));
@@ -224,44 +265,12 @@ export default class Department extends React.Component{
             data: JSON.stringify(data),
             dataType: "application/json",
             crossDomain: true
-        }).always(function(xhr) {
-            if(xhr.status === 200){
-                this.__getDepartmentData();
+        }).always(function (xhr) {
+            if (xhr.status === 200) {
+                this.__getMeetingDatas();
             }
         }.bind(this));
     };
 
-
-
-    openModal=() => {
-        this.setState({
-            visible : true
-        });
-    }
-
-    closeModal =() => {
-        this.__clearForm();
-        this.setState({
-
-            visible : false
-        });
-    }
-
-
-    componentDidMount () {
-
-        this.__getDepartmentData();
-
-        jajax.ajax({
-            url: "http://localhost:8080/meeting/findAll",
-            method: "GET",
-            dataType: "application/json",
-            crossDomain: true
-        }).always(function(xhr) {
-            if(xhr.status === 200){
-                this.setState({meetingData: JSON.parse(xhr.responseText)});
-            }
-        }.bind(this));
-    };
 
 }

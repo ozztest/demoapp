@@ -9,117 +9,96 @@ import Table from "react-bootstrap/lib/Table";
 import Button from "react-bootstrap/lib/Button";
 import Modal from 'react-awesome-modal';
 
-export default class Meeting extends React.Component{
+export default class Meeting extends React.Component {
     constructor(props) {
         super(props);
-
         this.state = {
-            meetingData : [],
-            departmentData : [],
+            meetingData: [],
+            departmentData: [],
+            department: "",
+            id: undefined,
             name: "",
             description: "",
             update: true,
-            buttonName: "Add New "
+            buttonName: "Add New ",
+            visible: false
         };
     }
 
     render() {
         return (
+
             <Panel header={"Meeting"} bsStyle="success">
 
-                <Col style={{padding: 10}}>
-                    <TextInput
-                        label="Name"
-                        name="name"
-                        validationDisplay="overlay"
-                        value={this.state.name}
-                        onChange={this.__handleChange}
-                        validations={{
+                <Modal
+                    visible={this.state.visible}
+                    width="500"
+                    height="350"
+                    effect="fadeInUp"
+                    onClickAway={() => this.closeModal()}
+                    >
+
+                    <Col style={{padding: 10}}>
+                        <TextInput
+                            label="Name"
+                            name="name"
+                            validationDisplay="overlay"
+                            value={this.state.name}
+                            onChange={this.__handleChange}
+                            validations={{
                         required: true
 
                     }}/>
 
-                    <TextInput
-                        label="Description"
-                        name="description"
-                        validationDisplay="overlay"
-                        value={this.state.description}
-                        onChange={this.__handleChange}
-                        validations={{
+                        <TextInput
+                            label="Description"
+                            name="description"
+                            validationDisplay="overlay"
+                            value={this.state.description}
+                            onChange={this.__handleChange}
+                            validations={{
                         required: true,
-
+                        minLength: {
+                            args: [3]
+                        }
                     }}/>
 
-                    <SelectInput
-                        label="Departments"
-                        name="department"
-                        multi={true}
-                        items={this.state.departmentData}
-                        value={this.state.department}
-                        textField="value"
-                        valueField="key"
-                        onChange={this.__handleChange}
-                        validations={{
-                        required: true
-                    }}
-                        />
-
-
-                    <Button className="pull-right" bsStyle="success" style={{marginBottom: 15}}
-                            onClick={this.__saveMeeting}>{this.state.buttonName} Meeting</Button>
-
-                </Col>
+                        <SelectInput
+                            label="Meeting"
+                            name="department"
+                            items={this.state.departmentData}
+                            textField="name"
+                            valueField="id"
+                            readOnly={true}
+                            value={this.state.department}
+                            onChange={this.__handleChange}
+                            />
+                        {this.__closePopupButton()}
+                        <Button className="pull-right" bsStyle="success" style={{marginTop: 15}}
+                                onClick={this.__saveDepartment}>{this.state.buttonName} Meeting</Button>
+                    </Col>
+                </Modal>
                 {this.__renderTable()}
 
+                <Button className="pull-right" bsStyle="success" style={{marginBottom: 15}}
+                        onClick={() => this.openModal()}> Add New Meeting</Button>
             </Panel>
         );
     }
-    __saveMeeting =(e) => {
-        let data = {
-            name: this.state.name,
-            description: this.state.description,
-            department: {
-                id: this.state.department
-            }
-        };
-        let url = "http://localhost:8080/meeting/save/" + this.state.department;
-        let method="POST";
 
-        if(this.state.update){
-            url ="http://localhost:8080/meeting/update/";
-            method = "PUT";
-        }
-        jajax.ajax({
-            url: url,
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            method: method,
-            data: JSON.stringify(data),
-            dataType: "application/json",
-            crossDomain: true
-        }).always(function(xhr) {
-            if(xhr.status === 200){
-                Toast.success("Meeting saved successfully...");
-                this.__getDepartmentData()
-                this.setState({
-                    name: "",
-                    description: "",
-                    department: "",
-                    buttonName: "Add New ",
-                    update:false
-                });
-            }
-        }.bind(this));
 
-    }
+
 
     __handleChange = (e) => {
         let state = {};
         let value = e.target.parsedValue !== undefined ? e.target.parsedValue : e.target.value;
         state[e.target.name] = value;
         this.setState(state);
+    };
+
+    __closePopupButton = () =>{
+        return <Button className="pull-left" bsStyle="success" style={{marginTop: 15}}
+                       onClick={() => this.closeModal()} > Cancel</Button>;
     }
 
     __renderTable = () => {
@@ -142,47 +121,135 @@ export default class Meeting extends React.Component{
     __renderTableRows = () => {
         let arr = [];
         let datas = this.state.meetingData;
-
-        for(let i = 0; i< datas.length; i++){
+        for (let i = 0; i < datas.length; i++) {
             let data = datas[i];
             arr.push(
                 <tr key={i}>
                     <td>{data.id}</td>
                     <td>{data.name}</td>
                     <td>{data.description}</td>
-                    <td>{data.meeting}</td>
-                    <td><Button onClick={this.__fillAreasWithSelectedMeeting.bind(undefined, data)}>Update</Button>
-                        <Button onClick={this.__onDelete.bind(undefined, data)}>Delete</Button></td>
+                    <td>
+                        <Button style={{margin: 5}}
+                                onClick={this.__fillAreasWithSelectedMeeting.bind(undefined, data)}>
+                            Update
+                        </Button>
+                        <Button style={{margin: 5}}
+                                onClick={this.__onDelete.bind(undefined, data)}>
+                            Delete
+                        </Button>
+                    </td>
                 </tr>);
         }
         return arr;
     };
 
-    __getMeetingData = () => {
+
+    __fillAreasWithSelectedMeeting = (data) => {
+        this.openModal();
+        this.setState({
+            id: data.id,
+            name: data.name,
+            description: data.description,
+            buttonName: "Update ",
+            update: true
+        });
+    };
+
+
+    __clearForm() {
+        this.setState({
+            id: undefined,
+            name: "",
+            description: "",
+            department: "",
+            buttonName: "Add New ",
+            update: false
+        });
+    };
+
+    openModal = () => {
+        this.setState({
+            visible: true
+        });
+    }
+
+    closeModal = () => {
+        this.__clearForm();
+        this.setState({
+            visible: false
+        });
+    }
+
+
+    componentDidMount() {
+
+        this.__getMeetingDatas();
+        this.__getDepartmentDatas();
+
+    }
+
+    __getDepartmentDatas = ()=> {
+        jajax.ajax({
+            url: "http://localhost:8080/department/findAll",
+            method: "GET",
+            dataType: "application/json",
+            crossDomain: true
+        }).always(function (xhr) {
+            if (xhr.status === 200) {
+                this.setState({departmentData: JSON.parse(xhr.responseText)});
+            }
+        }.bind(this));
+    };
+    __getMeetingDatas = () => {
         jajax.ajax({
             url: "http://localhost:8080/meeting/findAll",
             method: "GET",
             dataType: "application/json",
             crossDomain: true
-        }).always(function(xhr) {
-            if(xhr.status === 200){
-                this.setState({employeeData: JSON.parse(xhr.responseText)});
+        }).always(function (xhr) {
+            if (xhr.status === 200) {
+                this.setState({meetingData: JSON.parse(xhr.responseText)});
             }
         }.bind(this));
     };
+    __saveDepartment = (e) => {
 
-    __fillAreasWithSelectedMeeting= (data) =>{
-        this.setState({
-            name: data.name,
-            description:data.description,
-            department:data.department.id,
-            buttonName:"Update ",
-            update:true
-        });
+        let data = {
+            id: this.state.id,
+            name: this.state.name,
+            description: this.state.description,
+            department: {
+                id: this.state.department
+            }
+        };
+        let url = "http://localhost:8080/meeting/save/" + this.state.department;
+        let method = "POST";
+
+        if (this.state.update) {
+            url = "http://localhost:8080/meeting/update/";
+            method = "PUT";
+        }
+        jajax.ajax({
+            url: url,
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            method: method,
+            data: JSON.stringify(data),
+            dataType: "application/json",
+            crossDomain: true
+        }).always(function (xhr) {
+            if (xhr.status === 200) {
+                Toast.success("Meeting saved successfully...");
+                this.__getMeetingDatas();
+                this.__clearForm()
+            }
+        }.bind(this));
+
+        this.closeModal();
 
     };
-
-
     __onDelete = (data) => {
         jajax.ajax({
             url: "http://localhost:8080/meeting/delete",
@@ -194,27 +261,12 @@ export default class Meeting extends React.Component{
             data: JSON.stringify(data),
             dataType: "application/json",
             crossDomain: true
-        }).always(function(xhr) {
-            if(xhr.status === 200){
-                this.__getDepartmentData()
+        }).always(function (xhr) {
+            if (xhr.status === 200) {
+                this.__getMeetingDatas();
             }
         }.bind(this));
     };
 
-    componentDidMount () {
-
-        this.__getMeetingData();
-
-        jajax.ajax({
-            url: "http://localhost:8080/meeting/findAll",
-            method: "GET",
-            dataType: "application/json",
-            crossDomain: true
-        }).always(function(xhr) {
-            if(xhr.status === 200){
-                this.setState({meetingData: JSON.parse(xhr.responseText)});
-            }
-        }.bind(this));
-    };
 
 }

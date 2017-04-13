@@ -34,7 +34,7 @@ export default class Employee extends React.Component{
                 <Modal
                     visible={this.state.visible}
                     width="500"
-                    height="350"
+                    height="400"
                     effect="fadeInUp"
                     onClickAway={() => this.closeModal()}
                     >
@@ -85,8 +85,9 @@ export default class Employee extends React.Component{
                         value={this.state.department}
                         onChange={this.__handleChange}
                         />
+                    {this.__closePopupButton()}
 
-                    <Button className="pull-right" bsStyle="success" style={{marginBottom: 15}}
+                    <Button className="pull-right" bsStyle="success" style={{marginTop: 15}}
                             onClick={this.__saveEmployee}>{this.state.buttonName} Employee</Button>
                 </Col>
                 </Modal>
@@ -97,79 +98,6 @@ export default class Employee extends React.Component{
             </Panel>
         );
     }
-
-    openModal=() => {
-        this.setState({
-            visible : true
-        });
-    }
-
-    closeModal =() => {
-        this.__clearForm();
-        this.setState({
-
-            visible : false
-        });
-    }
-
-
-    __saveEmployee =(e) => {
-        let data = {
-            id: this.state.id,
-            name: this.state.name,
-            surname: this.state.surname,
-            salary: this.state.salary,
-            department: {
-                id: this.state.department
-            }
-        };
-        let url = "http://localhost:8080/employee/save/" + this.state.department;
-        let method="POST";
-
-        if(this.state.update){
-            console.log(this.state.update);
-            url ="http://localhost:8080/employee/update/";
-            method = "PUT";
-            console.log(method)
-        }
-        jajax.ajax({
-            url: url,
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            method: method,
-            data: JSON.stringify(data),
-            dataType: "application/json",
-            crossDomain: true
-        }).always(function(xhr) {
-            if(xhr.status === 200){
-                Toast.success("Employee saved successfully...");
-                this.__getEmployeeData();
-               this.__clearForm()
-            }
-        }.bind(this));
-
-        this.closeModal();
-
-    };
-    __clearForm () {
-        this.setState({
-            id:undefined,
-            name: "",
-            surname: "",
-            salary: undefined,
-            department: "",
-            buttonName: "Add New ",
-            update:false
-        });
-};
-    __handleChange = (e) => {
-        let state = {};
-        let value = e.target.parsedValue !== undefined ? e.target.parsedValue : e.target.value;
-        state[e.target.name] = value;
-        this.setState(state);
-    };
 
     __renderTable = () => {
         return <Table responsive style={{marginTop: 60}}>
@@ -218,17 +146,42 @@ export default class Employee extends React.Component{
         return arr;
     };
 
-    __getEmployeeData = () => {
-        jajax.ajax({
-            url: "http://localhost:8080/employee/findAll",
-            method: "GET",
-            dataType: "application/json",
-            crossDomain: true
-        }).always(function(xhr) {
-            if(xhr.status === 200){
-                this.setState({employeeData: JSON.parse(xhr.responseText)});
-            }
-        }.bind(this));
+    __handleChange = (e) => {
+        let state = {};
+        let value = e.target.parsedValue !== undefined ? e.target.parsedValue : e.target.value;
+        state[e.target.name] = value;
+        this.setState(state);
+    };
+
+    __clearForm () {
+        this.setState({
+            id:undefined,
+            name: "",
+            surname: "",
+            salary: undefined,
+            department: "",
+            buttonName: "Add New ",
+            update:false
+        });
+    };
+
+    openModal=() => {
+        this.setState({
+            visible : true
+        });
+    };
+
+    closeModal =() => {
+        this.__clearForm();
+        this.setState({
+
+            visible : false
+        });
+    };
+
+    __closePopupButton = () =>{
+        return <Button className="pull-left" bsStyle="success" style={{marginTop: 15}}
+                       onClick={() => this.closeModal()} >Cancel</Button>;
     };
 
     __fillAreasWithSelectedEmployee= (data) =>{
@@ -245,6 +198,46 @@ export default class Employee extends React.Component{
         });
     };
 
+
+    __saveEmployee =(e) => {
+        let data = {
+            id: this.state.id,
+            name: this.state.name,
+            surname: this.state.surname,
+            salary: this.state.salary,
+            department: {
+                id: this.state.department
+            }
+        };
+        let url = "http://localhost:8080/employee/save/" + this.state.department;
+        let method="POST";
+
+        if(this.state.update){
+            url ="http://localhost:8080/employee/update/";
+            method = "PUT";
+            console.log(method)
+        }
+        jajax.ajax({
+            url: url,
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            method: method,
+            data: JSON.stringify(data),
+            dataType: "application/json",
+            crossDomain: true
+        }).always(function(xhr) {
+            if(xhr.status === 200){
+                Toast.success("Employee saved successfully...");
+                this.__getEmployeeData();
+                this.__clearForm()
+            }
+        }.bind(this));
+
+        this.closeModal();
+
+    };
 
     __onDelete = (data) => {
         jajax.ajax({
@@ -267,6 +260,11 @@ export default class Employee extends React.Component{
     componentDidMount () {
 
         this.__getEmployeeData();
+        this.__getDepartmentData();
+
+    };
+
+    __getDepartmentData = ()=>{
 
         jajax.ajax({
             url: "http://localhost:8080/department/findAll",
@@ -276,6 +274,19 @@ export default class Employee extends React.Component{
         }).always(function(xhr) {
             if(xhr.status === 200){
                 this.setState({departmentData: JSON.parse(xhr.responseText)});
+            }
+        }.bind(this));
+    }
+
+    __getEmployeeData = () => {
+        jajax.ajax({
+            url: "http://localhost:8080/employee/findAll",
+            method: "GET",
+            dataType: "application/json",
+            crossDomain: true
+        }).always(function(xhr) {
+            if(xhr.status === 200){
+                this.setState({employeeData: JSON.parse(xhr.responseText)});
             }
         }.bind(this));
     };

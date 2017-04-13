@@ -26,12 +26,11 @@ export default class App extends Component {
                 <Navbar>
                     <Navbar.Header>
                         <Navbar.Brand>
-                            <a href="#">React-Bootstrap</a>
+                            <a href="#">React-Bootstrap-SpringBoot Example</a>
                         </Navbar.Brand>
                     </Navbar.Header>
                     <Nav>
-                        <NavItem eventKey={1} href="#">Link</NavItem>
-                        <NavItem eventKey={2} href="#">Link</NavItem>
+                        <NavItem eventKey={1} href="#">buraya da github linki koyduk mu tamamdýr</NavItem>
                     </Nav>
                 </Navbar>
             <Col style={{paddingLeft: 100,paddingRight: 100}}>
