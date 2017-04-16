@@ -20,7 +20,7 @@ export default class Employee extends React.Component{
                 name: "",
                 surname: "",
                 salary: undefined,
-                update: true,
+                update: false,
                 buttonName: "Add New ",
                 visible:false
             };
@@ -208,6 +208,7 @@ export default class Employee extends React.Component{
             department: {
                 id: this.state.department
             }
+
         };
         let url = "http://localhost:8080/employee/save/" + this.state.department;
         let method="POST";
@@ -215,7 +216,6 @@ export default class Employee extends React.Component{
         if(this.state.update){
             url ="http://localhost:8080/employee/update/";
             method = "PUT";
-            console.log(method)
         }
         jajax.ajax({
             url: url,
@@ -258,13 +258,12 @@ export default class Employee extends React.Component{
     };
 
     componentDidMount () {
-
         this.__getEmployeeData();
-        this.__getDepartmentData();
+        this.__getDepartmentDatasForEmployee();
 
     };
 
-    __getDepartmentData = ()=>{
+    __getDepartmentDatasForEmployee = ()=>{
 
         jajax.ajax({
             url: "http://localhost:8080/department/findAll",
@@ -289,6 +288,7 @@ export default class Employee extends React.Component{
                 this.setState({employeeData: JSON.parse(xhr.responseText)});
             }
         }.bind(this));
+
     };
 
 }

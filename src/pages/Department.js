@@ -13,15 +13,17 @@ export default class Department extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            departmentData: [],
+            departmentData: this.props.departmentData,
             meetingData: [],
             meeting: "",
             id: undefined,
             name: "",
             description: "",
-            update: true,
+            update: false,
             buttonName: "Add New ",
-            visible: false
+            visible: false,
+            visibleMeeting: false,
+            meetings: []
         };
     }
 
@@ -64,13 +66,14 @@ export default class Department extends React.Component {
                     }}/>
 
                         <SelectInput
-                            label="Meeting"
-                            name="meeting"
+                            label="Set Meeting"
+                            name="meetings"
                             items={this.state.meetingData}
                             textField="name"
                             valueField="id"
                             readOnly={true}
-                            value={this.state.meeting}
+                            multi={true}
+                            value={this.state.meetings}
                             onChange={this.__handleChange}
                             />
                         {this.__closePopupButton()}
@@ -88,7 +91,6 @@ export default class Department extends React.Component {
             </Panel>
         );
     }
-
 
     __handleChange = (e) => {
         let state = {};
@@ -115,10 +117,30 @@ export default class Department extends React.Component {
             </thead>
             <tbody>
             {this.__renderTableRows()}
-
             </tbody>
         </Table>;
     };
+
+    __renderTableMeetingsRows = (data)=> {
+        let arr = [];
+        let datas = data.meetings;
+        for (let i = 0; i < datas.length; i++) {
+            let data = datas[i];
+            arr.push(
+                <table>
+                    <tbody>
+                    <tr>
+                        <td>
+                            {data.name}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            )
+        }
+        return arr;
+    }
+
 
     __renderTableRows = () => {
         let arr = [];
@@ -130,6 +152,9 @@ export default class Department extends React.Component {
                     <td>{data.id}</td>
                     <td>{data.name}</td>
                     <td>{data.description}</td>
+                    <td>
+                        {this.__renderTableMeetingsRows(data)}
+                    </td>
                     <td>
                         <Button style={{margin: 5}}
                                 onClick={this.__fillAreasWithSelectedDepartment.bind(undefined, data)}>
@@ -165,15 +190,18 @@ export default class Department extends React.Component {
             description: "",
             meeting: "",
             buttonName: "Add New ",
-            update: false
+            update: false,
+            meetings:[]
         });
-    };
+    }
+
+;
 
     openModal = () => {
         this.setState({
             visible: true
         });
-    }
+    };
 
     closeModal = () => {
         this.__clearForm();
@@ -183,13 +211,18 @@ export default class Department extends React.Component {
         });
     }
 
+
     componentDidMount() {
-
+        console.log("uc")
+        console.log(this.props.departmentData)
         this.__getDepartmentData();
-        this.__getMeetingData();
-    };
+        this.__getMeetingDatasForDepartment();
 
-    __getMeetingData = ()=> {
+    }
+
+;
+
+    __getMeetingDatasForDepartment = ()=> {
         jajax.ajax({
             url: "http://localhost:8080/meeting/findAll",
             method: "GET",
@@ -198,6 +231,7 @@ export default class Department extends React.Component {
         }).always(function (xhr) {
             if (xhr.status === 200) {
                 this.setState({meetingData: JSON.parse(xhr.responseText)});
+                console.log("meetingupdated")
             }
         }.bind(this));
     }
@@ -220,17 +254,13 @@ export default class Department extends React.Component {
         let data = {
             id: this.state.id,
             name: this.state.name,
-            description: this.state.description,
-            meeting: {
-                id: this.state.meeting
-            }
+            description: this.state.description
         };
-        console.log(data)
-        let url = "http://localhost:8080/department/save/" + this.state.meeting;
+        let url = "http://localhost:8080/department/save/" + this.state.meetings;
         let method = "POST";
 
         if (this.state.update) {
-            url = "http://localhost:8080/department/update/";
+            url = "http://localhost:8080/department/update/"+ this.state.meetings;
             method = "PUT";
         }
         jajax.ajax({
@@ -246,7 +276,8 @@ export default class Department extends React.Component {
         }).always(function (xhr) {
             if (xhr.status === 200) {
                 Toast.success("Department saved successfully...");
-                this.__getMeetingDatas();
+                this.__getDepartmentData();
+                this.__getMeetingDatasForDepartment();
                 this.__clearForm()
             }
         }.bind(this));
@@ -267,7 +298,7 @@ export default class Department extends React.Component {
             crossDomain: true
         }).always(function (xhr) {
             if (xhr.status === 200) {
-                this.__getMeetingDatas();
+                this.__getDepartmentData();
             }
         }.bind(this));
     };

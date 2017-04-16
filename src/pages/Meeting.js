@@ -19,7 +19,7 @@ export default class Meeting extends React.Component {
             id: undefined,
             name: "",
             description: "",
-            update: true,
+            update: false,
             buttonName: "Add New ",
             visible: false
         };
@@ -62,17 +62,6 @@ export default class Meeting extends React.Component {
                             args: [3]
                         }
                     }}/>
-
-                        <SelectInput
-                            label="Meeting"
-                            name="department"
-                            items={this.state.departmentData}
-                            textField="name"
-                            valueField="id"
-                            readOnly={true}
-                            value={this.state.department}
-                            onChange={this.__handleChange}
-                            />
                         {this.__closePopupButton()}
                         <Button className="pull-right" bsStyle="success" style={{marginTop: 15}}
                                 onClick={this.__saveDepartment}>{this.state.buttonName} Meeting</Button>
@@ -184,11 +173,11 @@ export default class Meeting extends React.Component {
     componentDidMount() {
 
         this.__getMeetingDatas();
-        this.__getDepartmentDatas();
+        this.__getDepartmentDatasForMeeting();
 
     }
 
-    __getDepartmentDatas = ()=> {
+    __getDepartmentDatasForMeeting = ()=> {
         jajax.ajax({
             url: "http://localhost:8080/department/findAll",
             method: "GET",
@@ -217,12 +206,9 @@ export default class Meeting extends React.Component {
         let data = {
             id: this.state.id,
             name: this.state.name,
-            description: this.state.description,
-            department: {
-                id: this.state.department
-            }
+            description: this.state.description
         };
-        let url = "http://localhost:8080/meeting/save/" + this.state.department;
+        let url = "http://localhost:8080/meeting/save/";
         let method = "POST";
 
         if (this.state.update) {
@@ -244,6 +230,7 @@ export default class Meeting extends React.Component {
                 Toast.success("Meeting saved successfully...");
                 this.__getMeetingDatas();
                 this.__clearForm()
+
             }
         }.bind(this));
 
