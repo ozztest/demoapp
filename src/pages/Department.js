@@ -13,7 +13,7 @@ export default class Department extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            departmentData: this.props.departmentData,
+            departmentData: [],
             meetingData: [],
             meeting: "",
             id: undefined,
@@ -129,7 +129,7 @@ export default class Department extends React.Component {
             arr.push(
                 <table>
                     <tbody>
-                    <tr>
+                    <tr key={i}>
                         <td>
                             {data.name}
                         </td>
@@ -191,7 +191,7 @@ export default class Department extends React.Component {
             meeting: "",
             buttonName: "Add New ",
             update: false,
-            meetings:[]
+            meetings: []
         });
     }
 
@@ -213,11 +213,8 @@ export default class Department extends React.Component {
 
 
     componentDidMount() {
-        console.log("uc")
-        console.log(this.props.departmentData)
         this.__getDepartmentData();
         this.__getMeetingDatasForDepartment();
-
     }
 
 ;
@@ -231,7 +228,6 @@ export default class Department extends React.Component {
         }).always(function (xhr) {
             if (xhr.status === 200) {
                 this.setState({meetingData: JSON.parse(xhr.responseText)});
-                console.log("meetingupdated")
             }
         }.bind(this));
     }
@@ -260,7 +256,7 @@ export default class Department extends React.Component {
         let method = "POST";
 
         if (this.state.update) {
-            url = "http://localhost:8080/department/update/"+ this.state.meetings;
+            url = "http://localhost:8080/department/update/" + this.state.meetings;
             method = "PUT";
         }
         jajax.ajax({
@@ -301,6 +297,15 @@ export default class Department extends React.Component {
                 this.__getDepartmentData();
             }
         }.bind(this));
+    };
+
+    componentWillReceiveProps = (nextProps) => {
+        if (nextProps.meetingData || nextProps.departmentData) {
+            this.setState({
+                meetingData: nextProps.meetingData,
+                departmentData: nextProps.departmentData
+            });
+        }
     };
 
 

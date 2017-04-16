@@ -13,17 +13,17 @@ import jajax from "robe-ajax";
 
 export default class App extends React.Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
-            employeeData : [],
-            departmentData : [],
-            meeting:"test"
+            employeeData: [],
+            departmentData: [],
+            meetingData: []
         };
     }
 
-    render () {
+    render() {
         return (
             <Col>
                 <Navbar>
@@ -36,32 +36,37 @@ export default class App extends React.Component {
                         <NavItem eventKey={1} href="#">buraya da github linki koyduk mu tamamdýr</NavItem>
                     </Nav>
                 </Navbar>
-            <Col style={{paddingLeft: 100,paddingRight: 100}}>
+                <Col style={{paddingLeft: 100,paddingRight: 100}}>
 
-                <Tabs defaultActiveKey={2} id="uncontrolled-tab-example">
-                <Tab eventKey={1} title="Employee">
-                    <Employee />
-                </Tab>
-                <Tab eventKey={2} title="Department">
-                    <Department departmentData={this.state.departmentData} />
-                </Tab>
-                <Tab eventKey={3} title="Meeting">
-                    <Meeting/>
-                </Tab>
-            </Tabs>
-            </Col>
-                </Col>);
-    };
-
-
-    componentDidMount(){
-        console.log("bir")
-        this.__getDepartmentDat();
-        console.log(this.state.departmentData)
+                    <Tabs defaultActiveKey={2} onSelect={this.__onSelect} id="uncontrolled-tab-example">
+                        <Tab eventKey={1} departmentData={this.state.departmentData} title="Employee">
+                            <Employee />
+                        </Tab>
+                        <Tab eventKey={2} title="Department">
+                            <Department departmentData={this.state.departmentData}
+                                        meetingData={this.state.meetingData}/>
+                        </Tab>
+                        <Tab eventKey={3} title="Meeting">
+                            <Meeting/>
+                        </Tab>
+                    </Tabs>
+                </Col>
+            </Col>);
     }
 
-    __getDepartmentDat () {
-        console.log("iki")
+;
+
+    __onSelect = (key) => {
+        if (key == 2) {
+            this.__getDepartmentDatas();
+            this.__getMeetingDatas();
+        }
+        if (key == 1) {
+            this.__getDepartmentDatas();
+        }
+    };
+
+    __getDepartmentDatas() {
         jajax.ajax({
             url: "http://localhost:8080/department/findAll",
             method: "GET",
@@ -73,8 +78,22 @@ export default class App extends React.Component {
             }
         }.bind(this));
 
-    };
+    }
 
-};
+;
+
+    __getMeetingDatas = () => {
+        jajax.ajax({
+            url: "http://localhost:8080/meeting/findAll",
+            method: "GET",
+            dataType: "application/json",
+            crossDomain: true
+        }).always(function (xhr) {
+            if (xhr.status === 200) {
+                this.setState({meetingData: JSON.parse(xhr.responseText)});
+            }
+        }.bind(this));
+    };
+}
 
 

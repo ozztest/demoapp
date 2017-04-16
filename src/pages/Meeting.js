@@ -76,8 +76,6 @@ export default class Meeting extends React.Component {
     }
 
 
-
-
     __handleChange = (e) => {
         let state = {};
         let value = e.target.parsedValue !== undefined ? e.target.parsedValue : e.target.value;
@@ -85,9 +83,9 @@ export default class Meeting extends React.Component {
         this.setState(state);
     };
 
-    __closePopupButton = () =>{
+    __closePopupButton = () => {
         return <Button className="pull-left" bsStyle="success" style={{marginTop: 15}}
-                       onClick={() => this.closeModal()} > Cancel</Button>;
+                       onClick={() => this.closeModal()}> Cancel</Button>;
     }
 
     __renderTable = () => {
@@ -154,7 +152,9 @@ export default class Meeting extends React.Component {
             buttonName: "Add New ",
             update: false
         });
-    };
+    }
+
+;
 
     openModal = () => {
         this.setState({

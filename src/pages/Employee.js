@@ -10,20 +10,20 @@ import Table from "react-bootstrap/lib/Table";
 import Button from "react-bootstrap/lib/Button";
 import Modal from 'react-awesome-modal';
 
-export default class Employee extends React.Component{
+export default class Employee extends React.Component {
     constructor(props) {
         super(props);
-            this.state = {
-                employeeData : [],
-                departmentData : [],
-                id: undefined,
-                name: "",
-                surname: "",
-                salary: undefined,
-                update: false,
-                buttonName: "Add New ",
-                visible:false
-            };
+        this.state = {
+            employeeData: [],
+            departmentData: [],
+            id: undefined,
+            name: "",
+            surname: "",
+            salary: undefined,
+            update: false,
+            buttonName: "Add New ",
+            visible: false
+        };
     }
 
     render() {
@@ -39,62 +39,62 @@ export default class Employee extends React.Component{
                     onClickAway={() => this.closeModal()}
                     >
 
-                <Col style={{padding: 10}}>
-                    <TextInput
-                        label="Name"
-                        name="name"
-                        validationDisplay="overlay"
-                        value={this.state.name}
-                        onChange={this.__handleChange}
-                        validations={{
+                    <Col style={{padding: 10}}>
+                        <TextInput
+                            label="Name"
+                            name="name"
+                            validationDisplay="overlay"
+                            value={this.state.name}
+                            onChange={this.__handleChange}
+                            validations={{
                         required: true
 
                     }}/>
 
-                    <TextInput
-                        label="Surname"
-                        name="surname"
-                        validationDisplay="overlay"
-                        value={this.state.surname}
-                        onChange={this.__handleChange}
-                        validations={{
+                        <TextInput
+                            label="Surname"
+                            name="surname"
+                            validationDisplay="overlay"
+                            value={this.state.surname}
+                            onChange={this.__handleChange}
+                            validations={{
                         required: true,
                         minLength: {
                             args: [3]
                         }
                     }}/>
 
-                    <NumericInput
-                        label="Salary"
-                        name="salary"
-                        validationDisplay="overlay"
-                        value={this.state.salary}
-                        onChange={this.__handleChange}
-                        validations={{
+                        <NumericInput
+                            label="Salary"
+                            name="salary"
+                            validationDisplay="overlay"
+                            value={this.state.salary}
+                            onChange={this.__handleChange}
+                            validations={{
                         required: true
                     }}
-                        />
+                            />
 
-                    <SelectInput
-                        label="Department"
-                        name="department"
-                        items={this.state.departmentData}
-                        textField="name"
-                        valueField="id"
-                        readOnly={true}
-                        value={this.state.department}
-                        onChange={this.__handleChange}
-                        />
-                    {this.__closePopupButton()}
+                        <SelectInput
+                            label="Department"
+                            name="department"
+                            items={this.state.departmentData}
+                            textField="name"
+                            valueField="id"
+                            readOnly={true}
+                            value={this.state.department}
+                            onChange={this.__handleChange}
+                            />
+                        {this.__closePopupButton()}
 
-                    <Button className="pull-right" bsStyle="success" style={{marginTop: 15}}
-                            onClick={this.__saveEmployee}>{this.state.buttonName} Employee</Button>
-                </Col>
+                        <Button className="pull-right" bsStyle="success" style={{marginTop: 15}}
+                                onClick={this.__saveEmployee}>{this.state.buttonName} Employee</Button>
+                    </Col>
                 </Modal>
                 {this.__renderTable()}
 
                 <Button className="pull-right" bsStyle="success" style={{marginBottom: 15}}
-                        onClick={() => this.openModal()} > Add New Employee</Button>
+                        onClick={() => this.openModal()}> Add New Employee</Button>
             </Panel>
         );
     }
@@ -122,7 +122,7 @@ export default class Employee extends React.Component{
         let arr = [];
         let datas = this.state.employeeData;
 
-        for(let i = 0; i< datas.length; i++){
+        for (let i = 0; i < datas.length; i++) {
             let data = datas[i];
             arr.push(
                 <tr key={i}>
@@ -153,53 +153,55 @@ export default class Employee extends React.Component{
         this.setState(state);
     };
 
-    __clearForm () {
+    __clearForm() {
         this.setState({
-            id:undefined,
+            id: undefined,
             name: "",
             surname: "",
             salary: undefined,
             department: "",
             buttonName: "Add New ",
-            update:false
+            update: false
         });
-    };
+    }
 
-    openModal=() => {
+;
+
+    openModal = () => {
         this.setState({
-            visible : true
+            visible: true
         });
     };
 
-    closeModal =() => {
+    closeModal = () => {
         this.__clearForm();
         this.setState({
 
-            visible : false
+            visible: false
         });
     };
 
-    __closePopupButton = () =>{
+    __closePopupButton = () => {
         return <Button className="pull-left" bsStyle="success" style={{marginTop: 15}}
-                       onClick={() => this.closeModal()} >Cancel</Button>;
+                       onClick={() => this.closeModal()}>Cancel</Button>;
     };
 
-    __fillAreasWithSelectedEmployee= (data) =>{
+    __fillAreasWithSelectedEmployee = (data) => {
         this.openModal();
 
         this.setState({
-            id:data.id,
+            id: data.id,
             name: data.name,
-            surname:data.surname,
-            salary:data.salary,
-            department:data.department.id,
-            buttonName:"Update ",
-            update:true
+            surname: data.surname,
+            salary: data.salary,
+            department: data.department.id,
+            buttonName: "Update ",
+            update: true
         });
     };
 
 
-    __saveEmployee =(e) => {
+    __saveEmployee = (e) => {
         let data = {
             id: this.state.id,
             name: this.state.name,
@@ -211,10 +213,10 @@ export default class Employee extends React.Component{
 
         };
         let url = "http://localhost:8080/employee/save/" + this.state.department;
-        let method="POST";
+        let method = "POST";
 
-        if(this.state.update){
-            url ="http://localhost:8080/employee/update/";
+        if (this.state.update) {
+            url = "http://localhost:8080/employee/update/";
             method = "PUT";
         }
         jajax.ajax({
@@ -227,8 +229,8 @@ export default class Employee extends React.Component{
             data: JSON.stringify(data),
             dataType: "application/json",
             crossDomain: true
-        }).always(function(xhr) {
-            if(xhr.status === 200){
+        }).always(function (xhr) {
+            if (xhr.status === 200) {
                 Toast.success("Employee saved successfully...");
                 this.__getEmployeeData();
                 this.__clearForm()
@@ -250,28 +252,39 @@ export default class Employee extends React.Component{
             data: JSON.stringify(data),
             dataType: "application/json",
             crossDomain: true
-        }).always(function(xhr) {
-            if(xhr.status === 200){
+        }).always(function (xhr) {
+            if (xhr.status === 200) {
                 this.__getEmployeeData();
             }
         }.bind(this));
     };
 
-    componentDidMount () {
+    componentWillReceiveProps = (nextProps) => {
+        if (nextProps.departmentData) {
+            this.setState({
+                departmentData: nextProps.departmentData
+            });
+        }
+    };
+
+
+    componentDidMount() {
         this.__getEmployeeData();
         this.__getDepartmentDatasForEmployee();
 
-    };
+    }
 
-    __getDepartmentDatasForEmployee = ()=>{
+;
+
+    __getDepartmentDatasForEmployee = ()=> {
 
         jajax.ajax({
             url: "http://localhost:8080/department/findAll",
             method: "GET",
             dataType: "application/json",
             crossDomain: true
-        }).always(function(xhr) {
-            if(xhr.status === 200){
+        }).always(function (xhr) {
+            if (xhr.status === 200) {
                 this.setState({departmentData: JSON.parse(xhr.responseText)});
             }
         }.bind(this));
@@ -283,8 +296,8 @@ export default class Employee extends React.Component{
             method: "GET",
             dataType: "application/json",
             crossDomain: true
-        }).always(function(xhr) {
-            if(xhr.status === 200){
+        }).always(function (xhr) {
+            if (xhr.status === 200) {
                 this.setState({employeeData: JSON.parse(xhr.responseText)});
             }
         }.bind(this));
